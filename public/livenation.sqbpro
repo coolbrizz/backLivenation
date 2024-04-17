@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Users/anton/Desktop/MSPR_Partie_Backend/Back/public/livenation.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2301"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,13:mainevents_venues"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="events" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="50"/><column index="3" value="300"/><column index="4" value="77"/><column index="5" value="87"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="events_utc_date" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="83"/><column index="2" value="113"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="events_venues" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="83"/><column index="2" value="87"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">-- Suppression des tables si elles existent
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS events_venues;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS venues;
+DROP TABLE IF EXISTS utc_start_date_details;
+
+-- Création de la table 'venues'
+CREATE TABLE venues (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    venue VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    slug VARCHAR(255) NOT NULL
+);
+
+-- Création de la table 'events'
+CREATE TABLE events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    excerpt VARCHAR(255) NOT NULL,
+    venue_id INT UNSIGNED NOT NULL, 
+    FOREIGN KEY (venue_id) REFERENCES venues(id) ON DELETE CASCADE 
+);
+
+-- Création de la table 'utc_start_date_details'
+CREATE TABLE utc_start_date_details (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    year INT NOT NULL,
+    month INT NOT NULL,
+    day INT NOT NULL,
+    hour INT NOT NULL,
+    minutes INT NOT NULL,
+    event_id INT UNSIGNED NOT NULL, 
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+
+-- Création de la table 'users'
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+-- Création de la table de liaison 'events_venues'
+CREATE TABLE events_venues (
+    event_id INT UNSIGNED NOT NULL, 
+    venue_id INT UNSIGNED NOT NULL,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE, 
+    FOREIGN KEY (venue_id) REFERENCES venues(id) ON DELETE CASCADE 
+);
+
+-- Création de la table de liaison 'events_utc_date'
+CREATE TABLE events_utc_date (
+    event_id INT UNSIGNED NOT NULL, 
+    utc_start_id INT UNSIGNED NOT NULL,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE, 
+    FOREIGN KEY (utc_start_id) REFERENCES utc_start_date_details(id) ON DELETE CASCADE 
+);
+
+-- Insertion des données dans la table 'venues'
+INSERT INTO venues (venue, address, city, description, slug) VALUES
+('Toilettes', '48.826577', '2.348604', 'Ouvert 7/7j et 24/24h. Nettoyé toutes les heures.', 'toilette'),
+('Scène 1', '48.835292', '2.382842', 'Scène principale.', 'scene'),
+('Shop', '48.838689', '2.390116', &quot;Boutique de souvenirs et de jouets. Ouvert jusqu'à la fin des concerts.&quot;, 'shop'),
+('Shop', '48.840105', '2.364344', &quot;Boutique de souvenirs et de jouets. Ouvert jusqu'à la fin des concerts.&quot;, 'shop'),
+('Buvette', '48.829585', '2.388174', 'Soft drinks, bières, snacks.', 'buvette'),
+('Buvette', '48.820194', '2.341029', 'Soft drinks, bières.', 'buvette'),
+('Scène 5', '48.831366', '2.400266', 'Scène secondaire.', 'scene'),
+('Scène 4', '48.823907', '2.337652', 'Scène secondaire.', 'scene'),
+('Toilettes', '48.839584', '2.377985', 'Ouvert 7/7j et 24/24h. Nettoyé toutes les heures.', 'toilette'),
+('Scène 3', '48.816256', '2.386789', 'Scène secondaire.', 'scene'),
+('Scène 2', '48.844472', '2.362243', 'Scène secondaire.', 'scene');
+
+INSERT INTO events(title, description, excerpt, venue_id) VALUES 
+('DJ Venom', &quot;DJ Venom, de son vrai nom John Bekech, est un artiste électronique emblématique dont la carrière a marqué de manière significative la scène de la musique électronique depuis plusieurs décennies. Né aux États-Unis, Venom a commencé son voyage musical dans les années 90, une époque où la musique électronique commençait tout juste à émerger en tant que genre dominant. Venom est également connu pour ses performances énergétiques et envoûtantes sur scène. Il sait comment captiver son public, en utilisant des jeux de lumières époustouflants, des visuels impressionnants et une sélection musicale soigneusement choisie pour créer une expérience immersive. En plus de sa carrière de DJ, DJ Venom est également un producteur talentueux, ayant sorti de nombreux titres à succès au fil des ans. Ses productions sont souvent caractérisées par des basses puissantes, des mélodies accrocheuses et une production impeccable.&quot;, 'Electro', 1),
+('Deathje', &quot;Deathje est un groupe de metal qui transcende les limites du genre avec une intensité brute et une créativité déchaînée. Formé par un collectif de musiciens passionnés, Deathje incarne la fureur et la puissance du metal tout en y injectant une dose de mélodies sombres et de textes profonds. Leurs riffs de guitare déchirants, leur batterie impitoyable et les vocaux envoûtants du chanteur principal créent un son unique qui oscille entre la brutalité et la beauté. Les paroles de Deathje explorent des thèmes sombres, de la mort à la rébellion, offrant une expérience lyrique puissante. En live, le groupe électrise la scène, créant une atmosphère captivante qui attire les fans du metal du monde entier. Avec une détermination sans faille et une passion inextinguible, Deathje laisse une marque indélébile sur la scène du metal, prêt à conquérir de nouveaux sommets avec chaque performance et chaque album.&quot;, 'Métal', 2),
+('Blacking', &quot;BlackIng est un groupe de rap émergent qui incarne la quintessence de l(')authenticité et de la créativité dans le monde du hip-hop. Formé par un collectif de jeunes artistes talentueux issus de quartiers urbains dynamiques, BlackIng se distingue par ses paroles profondes et engageantes, qui reflètent la réalité de la vie dans les quartiers défavorisés. Le groupe se démarque par sa capacité à mélanger des rythmes percutants et des paroles incisives. Leurs chansons abordent des thèmes sociaux, politiques et personnels, offrant un aperçu perspicace de la vie quotidienne des jeunes marginalisés. La voix charismatique et l\'énergie sur scène du groupe créent une connexion instantanée avec le public, transformant chaque concert en une expérience mémorable. BlackIng ne se contente pas de suivre les tendances, mais il les définit également. Leur style vestimentaire distinctif, leur engagement envers la communauté et leur refus de compromettre leur intégrité artistique les distinguent sur la scène du rap.&quot;, 'Rap', 3),
+('Boombass', &quot;Boombass est une formation musicale unique qui repousse les limites de la percussion en incorporant deux batteurs de talent. Leur fusion rythmique crée une expérience sonore et visuelle captivante. Les deux batteurs synchronisent leurs frappes pour produire un mélange irrésistible de rythmes puissants, fusionnant des influences allant du rock au funk en passant par l\'électronique. Ce duo dynamique n\'est pas seulement une prouesse technique, mais aussi une expérience visuelle, avec une coordination impressionnante et des performances énergiques. Leurs rythmes pulsants incitent le public à danser et à se laisser emporter par la groove. Boombass incarne l\'innovation et l\'excitation dans le monde de la percussion live, créant un spectacle palpitant et mémorable qui transcende les genres musicaux. Ils sont la preuve vivante que la musique est une expérience physique et émotionnelle, prête à faire vibrer les foules du monde entier.&quot;, 'Jazz', 4),
+('Malumine', &quot;Malumine, jeune guitariste prodige, est une étoile montante de la scène musicale. À un âge précoce, sa passion pour la guitare a fleuri en un talent extraordinaire. Avec une virtuosité à couper le souffle, elle maîtrise divers genres musicaux, de la rock à la jazz en passant par le blues. Son jeu est caractérisé par des riffs enflammés, des solos captivants et une musicalité exceptionnelle. Ce qui distingue Malumine, c\'est sa capacité à exprimer des émotions profondes à travers sa musique. Chaque note semble raconter une histoire, chaque accord évoque une émotion. Sur scène, elle brille, captivant le public avec son charisme et son énergie indéniable. Malumine incarne la nouvelle génération de musiciens qui repoussent les frontières musicales et défient les attentes. Avec un avenir prometteur devant elle, elle est destinée à devenir une figure influente de la musique et à inspirer d\'autres jeunes artistes à suivre leur passion musicale.&quot;, 'Classique', 5),
+('Plipikak', &quot;Plipikak est un groupe de punk iconoclaste qui incarne l'esprit rebelle et l'authenticité brute du genre. Formé par un groupe d'amis passionnés, Plipikak injecte une dose d'énergie frénétique et de subversion dans chaque morceau. Leurs chansons, souvent courtes et percutantes, sont des cris de protestation contre la norme, l'hypocrisie et la conformité. La musique de Plipikak se caractérise par des riffs de guitare acérés, des paroles caustiques et un rythme effréné. Leurs performances live sont une explosion d'énergie, où le public est invité à se libérer et à exprimer sa révolte. Plipikak incarne la non-conformité et la contestation, rappelant à tous que le punk est un cri de liberté et d'authenticité. Avec leur attitude déterminée et leur musique provocatrice, ils continuent à secouer les conventions et à inspirer une génération de fans qui refusent de se plier aux normes établies.&quot;, 'Rock', 6),
+('Dj Sonos', &quot;DJ Sonos Farfelu est un artiste musical excentrique qui émerveille et surprend les foules avec sa créativité débridée. Sa musique est un véritable kaléidoscope sonore, fusionnant des genres, des échantillons bizarres et des rythmes inattendus pour créer une expérience auditive unique. Farfelu est un maître de la surprise, poussant les limites de l'expérimentation musicale à chaque performance. Sonos Farfelu est également un visionnaire visuel, utilisant des projections lumineuses, des costumes extravagants et des décors originaux pour créer des spectacles véritablement immersifs. Sa présence sur scène est magnétique, captivant le public avec son énergie débordante et son humour. Ce DJ farfelu incarne l'audace artistique et la liberté d'expression, invitant les auditeurs à embrasser le côté farfelu de la vie et à se laisser emporter par une expérience musicale et visuelle inoubliable.&quot;, 'Electro', 7),
+('Bass Trigger', &quot;Bass Trigger est un groupe de jazz contemporain qui explore les frontières de l'improvisation et de l'innovation musicale. Avec une formation classique de jazz composée de saxophone, piano, batterie et contrebasse, ce groupe élargit les horizons du genre en intégrant des éléments électroniques et des influences musicales diverses. La contrebasse, jouée avec virtuosité, est la pierre angulaire du son de Bass Trigger, offrant des lignes de basse hypnotiques et des harmonies audacieuses. Le saxophone et le piano ajoutent des mélodies captivantes, tandis que la batterie ajoute une rythmique dynamique. Bass Trigger crée une expérience musicale immersive, mêlant groove hypnotique et improvisation audacieuse. Leur musique transcende les genres, captivant les auditeurs avec des paysages sonores évocateurs et des performances live envoûtantes. Ils incarnent la fusion créative du jazz moderne, promettant un voyage musical inoubliable pour tous les amateurs de musique exigeants.&quot;, 'Jazz', 8),
+('Trivali', &quot;Trivali est un ensemble unique composé de trois violoncellistes virtuoses qui repoussent les limites de leur instrument pour créer une expérience musicale inoubliable. Leur fusion audacieuse de classique, de musique contemporaine et de world music transcende les genres, captivant un large public. Chacun des membres de Trivali apporte sa propre sensibilité musicale, ce qui se traduit par des harmonies riches et des mélodies envoûtantes. Leurs violoncelles créent un son enveloppant, alliant puissance et subtilité. L'interaction fluide entre les trois musiciens crée une synergie musicale exceptionnelle. Trivali offre des performances émotionnelles et visuellement captivantes qui transportent le public dans un voyage musical. Leur talent, leur créativité et leur passion pour la musique font de Trivali un groupe exceptionnel, célébrant la polyvalence et la beauté du violoncelle tout en repoussant les frontières de la musique de chambre contemporaine.&quot;, 'Classique', 9);
+
+
+
+INSERT INTO utc_start_date_details (year, month,day,hour,minutes, event_id) VALUES
+('2024','08','12','18','00',1),
+('2024','08','12','23','00',2),
+('2024','08','12','21','00',3),
+('2024','08','13','18','00',4),
+('2024','08','13','23','00',5),
+('2024','08','13','21','00',6),
+('2024','08','14','23','00',7),
+('2024','08','14','21','00',8),
+('2024','08','14','21','00',9);
+
+INSERT INTO users(username , password) Values 
+('admin', 'admin')</sql><current_tab id="0"/></tab_sql></sqlb_project>

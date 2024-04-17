@@ -1,0 +1,7 @@
+1/ on va sur packagiste et on telecharge altorouter
+2/On créée le fichier index.php dans le dossier public
+3/On crée notre feuille de route dans celui ci 
+4/ On installe les dépendance de whoops et dumper dans notre composer
+5/on installe la dépendance faker pour creer une base de données aléatoire
+
+
