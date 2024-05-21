@@ -1,9 +1,46 @@
 <?php
+
+
+include('./layout.php');
+require '../vendor/autoload.php';
+
+use App\App;
+
 $alert = null;
+if (isset($_POST['submit'])) {
+
+    $groupe = $_POST['title'];
+    $description = $_POST['description'];
+    $style = $_POST['excerpt'];
+    $venue = $_POST['venue_id'];
+
+    // Vérifier si les champs requis sont vides
+    if (empty($groupe) || empty($description) || empty($style) || empty($venue)) {
+        $alert = 'Veuillez remplir tous les champs du formulaire.';
+    } else {
+        // Connexion à la base de données
+        $pdo = App::getPDO();
+        // Préparer la requête SQL d'insertion avec des paramètres nommés
+        $sql = "INSERT INTO events (title, description, excerpt, venue_id, slug) VALUES (:title, :description, :excerpt, :venue_id, :slug)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':title', $groupe);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':excerpt', $style);
+        $stmt->bindParam(':venue_id', $venue);
+        $stmt->bindParam(':slug', $groupe);
+
+        $stmt->execute();
+
+        // Afficher un message de succès
+        echo '<div class="alert alert-success mt-3">Votre événement a bien été ajouté.</div>';
+        header('Location:../index.php');
+        exit;
+    }
+}
 ?>
 <div class="container mt-5">
     <h2 class="mb-4">Informations sur le groupe à ajouter</h2>
-    <form action="/" method="POST">
+    <form action="" method="POST">
         <div class="form-group">
             <label for="title">Nom du groupe</label>
             <input type="text" class="form-control" id="title" name="title" placeholder="Nom du groupe">
@@ -42,40 +79,4 @@ $alert = null;
     <?php if ($alert) : ?>
         <div class="alert alert-danger mt-3">Veuillez remplir tous les champs du formulaire.</div>
     <?php endif ?>
-    <?= dd($_POST) ?>
-    <?php
-    require '../vendor/autoload.php';
-
-    use App\Callsql;
-
-    if (isset($_POST['submit'])) {
-
-        $groupe = $_POST['title'];
-        $description = $_POST['description'];
-        $style = $_POST['excerpt'];
-        $venue = $_POST['venue_id'];
-
-        // Vérifier si les champs requis sont vides
-        if (empty($groupe) || empty($description) || empty($style) || empty($venue)) {
-            $alert = 'Veuillez remplir tous les champs du formulaire.';
-        } else {
-            // Connexion à la base de données
-            $pdo = Callsql::getPDO();
-            // Préparer la requête SQL d'insertion avec des paramètres nommés
-            $sql = "INSERT INTO events (title, description, excerpt, venue_id) VALUES (:title, :description, :excerpt, :venue_id)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':title', $groupe);
-            $stmt->bindParam(':description', $description);
-            $stmt->bindParam(':excerpt', $style);
-            $stmt->bindParam(':venue_id', $venue);
-
-            $stmt->execute();
-
-            // Afficher un message de succès
-            echo '<div class="alert alert-success mt-3">Votre événement a bien été ajouté.</div>';
-            $router->generate('home');
-            exit;
-        }
-    }
-    ?>
 </div>

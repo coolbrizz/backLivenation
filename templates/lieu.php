@@ -1,19 +1,30 @@
 <?php
 require '../vendor/autoload.php';
 
-use App\Callsql;
+use App\App;
 
 if (isset($_GET['nom'])) {
     $lieu = $_GET['nom'];
-    $pdo = Callsql::getPDO();
+    $pdo = App::getPDO();
     $query = $pdo->prepare('SELECT * FROM venues WHERE venue = :lieu');
     $query->execute(['lieu' => $lieu]);
     $venues = $query->fetch();
 } else {
     header('Location: home');
 }
-// dd($venues);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $venue = $_POST['venue'];
+    $pdo = App::getPDO();
+    $stmt = $pdo->prepare('DELETE FROM venues WHERE venue = :venue');
+    $stmt->bindParam(':venue', $venue, PDO::PARAM_STR);
+    $stmt->execute();
+    header('Location: ../home');
+    exit();
+}
+include('layout.php');
+
 ?>
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-8 mb-4">
@@ -25,19 +36,19 @@ if (isset($_GET['nom'])) {
                             $extensions = ['png', 'jpeg', 'jpg', 'gif'];
                             $imageFound = false;
                             foreach ($extensions as $ext) {
-                                $imageUrl = "photos/{$venues['slug']}.$ext";
+                                $imageUrl = "http://localhost:8000/photos/{$venues['slug']}.$ext";
                                 // Vérifier si le fichier image existe
                                 if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $imageUrl)) {
                                     $imageFound = true;
                             ?>
-                                    <img src="<?= htmlspecialchars($imageUrl) ?>" alt="Photo" style="width: 200px; height: 200px; margin-bottom: 20px">
+                                    <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $venues['slug'] ?>" style="width: 200px; height: 200px; margin-bottom: 20px">
                             <?php
                                     break;
                                 }
                             }
 
                             if (!$imageFound) {
-                                echo '<p>Aucune image disponible</p>'; // Message si aucune image n'est trouvée avec les extensions spécifiées
+                                echo '<p>Aucune image disponible</p>'; // Message si aucune image n'est trouvée 
                             }
                             ?>
                         </div>
@@ -49,5 +60,11 @@ if (isset($_GET['nom'])) {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="container mt-3">
+                <form action="" method="POST">
+                    <input type="hidden" name="venue" value="<?= htmlspecialchars($venues['venue']) ?>">
+                    <button type="submit" class="btn btn-danger mt-4">Supprimer ce lieu</button>
+                </form>
             </div>
         </div>

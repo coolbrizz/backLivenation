@@ -1,9 +1,15 @@
 <?php
-require '../vendor/autoload.php';
+session_start();
+require './vendor/autoload.php';
 
 use App\Callsql;
 
+if (!isset($_SESSION['auth'])) {
+    header('Location:templates/connexion.php');
+    exit();
+}
 try {
+
     $pdo = Callsql::getPDO();
     $events = Callsql::callevents();
     $venues = Callsql::callvenues();
@@ -14,6 +20,53 @@ try {
     exit();
 }
 ?>
+<?php
+if (isset($_POST['destroy_session'])) {
+    // Détruire une variable de session spécifique
+    unset($_SESSION['auth']);
+    header('Location:templates/connexion.php');
+}
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Back livenation</title>
+    <meta name="description" content="">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./templates/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Backend LiveNation</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="..\index.php">Accueil <span class="sr-only">home</span></a>
+                </li>
+            </ul>
+        </div>
+        <?php if (!empty($_SESSION['auth'])) : ?>
+            <form action="" method="post">
+                <button type="submit" name="destroy_session" class="bouton btn-danger">Se déconnecter</button>
+            </form>
+        <?php endif; ?>
+    </nav>
+
+    <div class="container mt-5">
+
+    </div>
+
+</body>
+
+</html>
 <div class="container">
     <h1 class="text-center mb-5">Retrouver toutes vos infos ici</h1>
     <div class="row mt-3">
@@ -23,14 +76,14 @@ try {
                 <div class="card-body">
                     <ul class="custom-list">
                         <?php foreach ($events as $event) : ?>
-                            <li><a style="font-weight: bold;" href="groupe?nom=<?= urlencode($event['title']) ?>"><?= $event['title'] ?></a></li>
+                            <li><a style="font-weight: bold;" href="./templates/groupe.php?nom=<?= urlencode($event['title']) ?>"><?= $event['title'] ?></a></li>
                         <?php endforeach ?>
                     </ul>
                 </div>
             </div>
             <div class="text-center">
 
-                <button class="bouton mt-3"><a href='<?= $router->generate('addGroup') ?>'>Ajouter un groupe</a></button>
+                <button class="bouton mt-3"><a href='/templates/addGroup.php'>Ajouter un groupe</a></button>
             </div>
         </div>
 
@@ -40,13 +93,13 @@ try {
                 <div class="card-body">
                     <ul class="custom-list">
                         <?php foreach ($venues as $venue) : ?>
-                            <li><a href="lieu?nom=<?= urlencode($venue['venue']) ?>"><?= $venue['venue'] ?></a></li>
+                            <li><a href="./templates/lieu.php?nom=<?= urlencode($venue['venue']) ?>"><?= $venue['venue'] ?></a></li>
                         <?php endforeach ?>
                     </ul>
                 </div>
             </div>
             <div class="text-center">
-                <button class="bouton mt-3"><a href='<?= $router->generate('addVenue') ?>'>Ajouter un lieu</a></button>
+                <button class="bouton mt-3"><a href='/templates/addVenue.php'>Ajouter un lieu</a></button>
             </div>
         </div>
 
@@ -75,7 +128,7 @@ try {
                 </div>
             </div>
             <div class="text-center">
-                <button class="bouton mt-3"><a href='<?= $router->generate('addDate') ?>'> Ajouter une date</a></button>
+                <button class="bouton mt-3"><a href='/templates/addDate.php'> Ajouter une date</a></button>
             </div>
         </div>
     </div>
@@ -86,7 +139,7 @@ try {
             <?php foreach ($programmation as $programmations) : ?>
                 <div class="col-md-3">
                     <div class="card mt-4">
-                        <div class="title card-header"><a style="color: black" href="groupe?nom=<?= urlencode($programmations['title']) ?>"><?= $programmations['title'] ?></a></div>
+                        <div class="title card-header"><a style="color: black" href="./templates/groupe.php?nom=<?= urlencode($programmations['title']) ?>"><?= $programmations['title'] ?></a></div>
                         <div class="card-body text-center">
                             <img src="http://localhost:8000/photos/<?= $programmations['slug'] ?>.jpeg" alt="Photo" style="width: 200px; height: 200px; margin-bottom : 20px">
                             <p>Lieux : <?= $programmations['venue'] ?></p>

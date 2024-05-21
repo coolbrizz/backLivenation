@@ -1,11 +1,20 @@
+<?php
+session_start();
+if (isset($_POST['destroy_session'])) {
+    // Détruire une variable de session spécifique
+    unset($_SESSION['auth']);
+    header('Location:templates/connexion.php');
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $pageTitle ?? 'Mon site' ?></title>
-    <meta name="description" content="<?= $pageDescription ?? '' ?>">
+    <title>Back livenation</title>
+    <meta name="description" content="">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
 </head>
@@ -19,18 +28,19 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="<?= $router->generate('home') ?>">Accueil <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?= $router->generate('connexion') ?>">Link</a>
+                    <a class="nav-link" href="..\index.php">Accueil <span class="sr-only">home</span></a>
                 </li>
             </ul>
         </div>
+        <?php if (!empty($_SESSION['auth'])) : ?>
+            <form action="" method="post">
+                <button type="submit" name="destroy_session" class="bouton btn-danger">Se déconnecter</button>
+            </form>
+        <?php endif; ?>
     </nav>
 
     <div class="container mt-5">
-        <!-- Contenu du backend PHP -->
-        <?= $pageContent ?>
+
     </div>
 
 </body>
