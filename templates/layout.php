@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 if (isset($_POST['destroy_session'])) {
     // Détruire une variable de session spécifique
     unset($_SESSION['auth']);

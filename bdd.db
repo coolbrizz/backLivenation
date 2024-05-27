@@ -114,4 +114,4 @@ INSERT INTO events_venues (event_id , venue_id) VALUES
 ('8' ,'8'),
 ('9','9');
 INSERT INTO users(username , password) Values 
-('admin', 'admin')
+('admin', ' $2y$10$WY6zKN9lFTV7ZBGjSVYo3eCLJx2DGICvMSbjByLSDSlXCpffVpiVu')

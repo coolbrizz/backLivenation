@@ -7,22 +7,21 @@ use App\App;
 session_start();
 $username = $_POST['username'] ?? NULL;
 $password = $_POST['password'] ?? NULL;
+$user = null;
 $errors = null;
 
-if (!empty($_POST)) {
-    $pdo = App::getPDO();
-    $query = $pdo->prepare('SELECT * FROM users WHERE username = :username ');
-    $query->execute(['username' => $username]);
-    $user = $query->fetch();
-
-
-
-    if (empty($_POST['username']) || empty($_POST['password'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (empty($username) || empty($password)) {
         $errors = 'Identifiants ou mot de passe incorrect';
     } else {
-        if ($user && $_POST['username'] === $user['username'] && $_POST['password'] === $user['password']) {
-            $_SESSION['auth'] = [$username, $password];
-            header('Location:../index.php');
+        $pdo = App::getPDO();
+        $query = $pdo->prepare('SELECT * FROM users WHERE username = :username');
+        $query->execute(['username' => $username]);
+        $user = $query->fetch();
+
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['auth'] = $username;
+            header('Location: ../index.php');
             exit();
         } else {
             $errors = 'Identifiants ou mot de passe incorrect';
@@ -30,7 +29,6 @@ if (!empty($_POST)) {
         }
     }
 }
-
 include('./layout.php');
 ?>
 <div class="titre text-center">
@@ -51,16 +49,21 @@ include('./layout.php');
                     <?php endif; ?>
                     <form action="" method="post">
                         <div class="form-group">
-                            <input type="text" class="form-control" name="username" placeholder="<?php if (!empty($username)) {
-                                                                                                        echo $username;
-                                                                                                    } else {
-                                                                                                        echo 'nom utilisateur';
-                                                                                                    } ?>">
+                            <input type="text" class="form-control" name="username" autocomplete="username" placeholder="<?php if (!empty($username)) {
+                                                                                                                                echo $username;
+                                                                                                                            } else {
+                                                                                                                                echo 'Nom utilisateur';
+                                                                                                                            } ?>">
                         </div>
                         <div class="form-group">
-                            <input type="password" class="form-control" name="password" placeholder="Mot de passe">
+                            <input type="password" class="form-control" name="password" placeholder="Mot de passe" autocomplete="current-password">
                         </div>
-                        <button type="submit" class="btn btn-primary">Me connecter</button>
+                        <div class="button">
+                            <button type="submit" class="bouton">Me connecter</button>
+                        </div>
+                        <div class="href">
+                            <a href=" changePassword.php" class="href">Modifier mot de passe</a>
+                        </div>
                     </form>
                 </div>
             </div>

@@ -38,7 +38,8 @@ include('layout.php');
                             foreach ($extensions as $ext) {
                                 $imageUrl = "http://localhost:8000/photos/{$venues['slug']}.$ext";
                                 // Vérifier si le fichier image existe
-                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $imageUrl)) {
+                                if ($imageUrl) {
+
                                     $imageFound = true;
                             ?>
                                     <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $venues['slug'] ?>" style="width: 200px; height: 200px; margin-bottom: 20px">
@@ -47,7 +48,7 @@ include('layout.php');
                                 }
                             }
 
-                            if (!$imageFound) {
+                            if ($imageFound === false) {
                                 echo '<p>Aucune image disponible</p>'; // Message si aucune image n'est trouvée 
                             }
                             ?>
